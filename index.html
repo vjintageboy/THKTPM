@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Quản lý dân cư</title>
+</head>
+<body>
+    <header>
+        <h1>Phần mềm quản lý dân cư</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#hoKhau">Quản lý hộ khẩu</a></li>
+            <li><a href="#nhanKhau">Quản lý nhân khẩu</a></li>
+            <li><a href="#baoCao">Báo cáo và thống kê</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="hoKhau">
+            <h2>Quản lý hộ khẩu</h2>
+            <button onclick="showAddHouseholdForm()">Thêm mới hộ khẩu</button>
+            <button onclick="showEditHouseholdForm()">Sửa đổi thông tin hộ khẩu</button>
+            <button onclick="deleteHousehold()">Xóa hộ khẩu</button>
+            <div id="householdForm" style="display:none;">
+                <h3>Thông tin hộ khẩu</h3>
+                <label for="soHoKhau">Số hộ khẩu:</label>
+                <input type="text" id="soHoKhau" required>
+                <label for="tenChuHo">Tên chủ hộ:</label>
+                <input type="text" id="tenChuHo" required>
+                <label for="diaChi">Địa chỉ:</label>
+                <input type="text" id="diaChi" required>
+                <button onclick="addHousehold()">Lưu thông tin</button>
+                <button onclick="hideHouseholdForm()">Hủy</button>
+            </div>
+        </section>
+        <section id="nhanKhau">
+            <h2>Quản lý nhân khẩu</h2>
+            <button onclick="showAddIndividualForm()">Thêm mới nhân khẩu</button>
+            <button onclick="showEditIndividualForm()">Cập nhật nhân khẩu</button>
+            <button onclick="deleteIndividual()">Xóa nhân khẩu</button>
+            <div id="individualForm" style="display:none;">
+                <h3>Thông tin nhân khẩu</h3>
+                <label for="hoTen">Họ tên:</label>
+                <input type="text" id="hoTen" required>
+                <label for="ngaySinh">Ngày sinh:</label>
+                <input type="date" id="ngaySinh" required>
+                <label for="ngheNghiep">Nghề nghiệp:</label>
+                <input type="text" id="ngheNghiep" required>
+                <label for="cmnd">Số CMND:</label>
+                <input type="text" id="cmnd" required>
+                <label for="moiQuanHe">Mối quan hệ với chủ hộ:</label>
+                <input type="text" id="moiQuanHe" required>
+                <button onclick="addIndividual()">Lưu thông tin</button>
+                <button onclick="hideIndividualForm()">Hủy</button>
+            </div>
+        </section>
+        <section id="baoCao">
+            <h2>Báo cáo và thống kê</h2>
+            <button onclick="generateReport()">Thống kê nhân khẩu</button>
+            <button onclick="exportReport()">Xuất báo cáo</button>
+        </section>
+    </main>
+    <footer>
+        <p>Hệ thống quản lý dân cư - Bản quyền © 2023</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>
