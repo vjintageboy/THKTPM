@@ -452,6 +452,7 @@ function logout() {
     // Redirect to login page
     window.location.href = 'TrangChu.html'; // Change to your login page
 }
+
 function generateReport() {
     const totalHouseholds = households.length;
     const totalIndividuals = individuals.length;
