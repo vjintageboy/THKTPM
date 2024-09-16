@@ -373,3 +373,19 @@ footer p {
 .form-actions button {
     padding: 10px 20px;
 }
+
+/* Thêm đoạn code sau vào cuối file style.css */
+.modal-content .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content .close:hover,
+.modal-content .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}

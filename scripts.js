@@ -239,11 +239,25 @@ async function deleteIndividual(index) {
     }
 }
 
-function showModal(modalId) {
-    document.getElementById(modalId).style.display = 'block';
+function showModal(modalId, content = null) {
+    const modal = document.getElementById(modalId);
+    if (content) {
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.innerHTML = `
+            <span class="close">&times;</span>
+            ${content}
+        `;
+        
+        // Thêm event listener cho nút đóng
+        const closeButton = modalContent.querySelector('.close');
+        closeButton.onclick = function() {
+            closeModal(modalId);
+        };
+    }
+    modal.style.display = 'block';
 }
 
-function hideModal(modalId) {
+function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
@@ -567,7 +581,16 @@ function showModal(modalId, content = null) {
     const modal = document.getElementById(modalId);
     if (content) {
         const modalContent = modal.querySelector('.modal-content');
-        modalContent.innerHTML = content;
+        modalContent.innerHTML = `
+            <span class="close">&times;</span>
+            ${content}
+        `;
+        
+        // Thêm event listener cho nút đóng
+        const closeButton = modalContent.querySelector('.close');
+        closeButton.onclick = function() {
+            closeModal(modalId);
+        };
     }
     modal.style.display = 'block';
 }
