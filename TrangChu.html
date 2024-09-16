@@ -8,74 +8,36 @@
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="Logo" class="logo"> <!-- Placeholder for logo -->
+        <img src="logo.png" alt="Logo" class="logo">
         <h1>Phần mềm quản lý dân cư</h1>
         <nav>
             <ul>
-                <li><a href="#hoKhau">Quản lý hộ khẩu</a></li>
-                <li><a href="#nhanKhau">Quản lý nhân khẩu</a></li>
-                <li><a href="#baoCao">Báo cáo và thống kê</a></li>
+                <li><a href="#hoKhauSection">Quản lý hộ khẩu</a></li>
+                <li><a href="#nhanKhauSection">Quản lý nhân khẩu</a></li>
+                <li><a href="#baoCaoSection">Báo cáo và thống kê</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <div id="notification" style="display:none;" role="alert"></div> <!-- Notification area -->
-        <section id="hoKhau" role="region" aria-labelledby="hoKhau">
-            <h2 id="hoKhau">Quản lý hộ khẩu</h2>
+        <div id="notification" style="display:none;" role="alert"></div>
+        <section id="hoKhauSection" role="region" aria-labelledby="hoKhauHeading">
+            <h2 id="hoKhauHeading">Quản lý hộ khẩu</h2>
             <button onclick="showAddHouseholdForm()" aria-label="Thêm mới hộ khẩu">Thêm mới hộ khẩu</button>
-            <button onclick="showEditHouseholdForm()" aria-label="Sửa đổi thông tin hộ khẩu">Sửa đổi thông tin hộ khẩu</button>
-            <button onclick="deleteHousehold()" aria-label="Xóa hộ khẩu">Xóa hộ khẩu</button>
-            <form id="householdForm" style="display:none;">
-                <h3>Thông tin hộ khẩu</h3>
-                <label for="soHoKhau">Số hộ khẩu:</label>
-                <input type="text" id="soHoKhau" required aria-required="true" aria-describedby="soHoKhauDesc">
-                <span id="soHoKhauDesc">Nhập số hộ khẩu của gia đình.</span>
-                
-                <label for="tenChuHo">Tên chủ hộ:</label>
-                <input type="text" id="tenChuHo" required aria-required="true" aria-describedby="tenChuHoDesc">
-                <span id="tenChuHoDesc">Nhập tên của chủ hộ.</span>
-                
-                <label for="diaChi">Địa chỉ:</label>
-                <input type="text" id="diaChi" required aria-required="true" aria-describedby="diaChiDesc">
-                <span id="diaChiDesc">Nhập địa chỉ (số nhà, đường, phường, quận).</span>
-                
-                <button type="button" onclick="addHousehold()" aria-label="Lưu thông tin hộ khẩu">Lưu thông tin</button>
-                <button type="button" onclick="hideHouseholdForm()" aria-label="Hủy">Hủy</button>
-            </form>
+            <div>
+                <h3>Danh sách hộ khẩu</h3>
+                <ul id="householdList"></ul>
+            </div>
         </section>
-        <section id="nhanKhau" role="region" aria-labelledby="nhanKhau">
-            <h2 id="nhanKhau">Quản lý nhân khẩu</h2>
+        <section id="nhanKhauSection" role="region" aria-labelledby="nhanKhauHeading">
+            <h2 id="nhanKhauHeading">Quản lý nhân khẩu</h2>
             <button onclick="showAddIndividualForm()" aria-label="Thêm mới nhân khẩu">Thêm mới nhân khẩu</button>
-            <button onclick="showEditIndividualForm()" aria-label="Cập nhật nhân khẩu">Cập nhật nhân khẩu</button>
-            <button onclick="deleteIndividual()" aria-label="Xóa nhân khẩu">Xóa nhân khẩu</button>
-            <form id="individualForm" style="display:none;">
-                <h3>Thông tin nhân khẩu</h3>
-                <label for="hoTen">Họ tên:</label>
-                <input type="text" id="hoTen" required aria-required="true" aria-describedby="hoTenDesc">
-                <span id="hoTenDesc">Nhập họ tên của nhân khẩu.</span>
-                
-                <label for="ngaySinh">Ngày sinh:</label>
-                <input type="date" id="ngaySinh" required aria-required="true" aria-describedby="ngaySinhDesc">
-                <span id="ngaySinhDesc">Chọn ngày sinh của nhân khẩu.</span>
-                
-                <label for="ngheNghiep">Nghề nghiệp:</label>
-                <input type="text" id="ngheNghiep" required aria-required="true" aria-describedby="ngheNghiepDesc">
-                <span id="ngheNghiepDesc">Nhập nghề nghiệp của nhân khẩu.</span>
-                
-                <label for="cmnd">Số CMND:</label>
-                <input type="text" id="cmnd" required aria-required="true" aria-describedby="cmndDesc">
-                <span id="cmndDesc">Nhập số CMND của nhân khẩu.</span>
-                
-                <label for="moiQuanHe">Mối quan hệ với chủ hộ:</label>
-                <input type="text" id="moiQuanHe" required aria-required="true" aria-describedby="moiQuanHeDesc">
-                <span id="moiQuanHeDesc">Nhập mối quan hệ với chủ hộ.</span>
-                
-                <button type="button" onclick="addIndividual()" aria-label="Lưu thông tin nhân khẩu">Lưu thông tin</button>
-                <button type="button" onclick="hideIndividualForm()" aria-label="Hủy">Hy</button>
-            </form>
+            <div>
+                <h3>Danh sách nhân khẩu</h3>
+                <ul id="individualList"></ul>
+            </div>
         </section>
-        <section id="baoCao" role="region" aria-labelledby="baoCao">
-            <h2 id="baoCao">Báo cáo và thống kê</h2>
+        <section id="baoCaoSection" role="region" aria-labelledby="baoCaoHeading">
+            <h2 id="baoCaoHeading">Báo cáo và thống kê</h2>
             <button onclick="generateReport()" aria-label="Thống kê nhân khẩu">Thống kê nhân khẩu</button>
             <button onclick="exportReport()" aria-label="Xuất báo cáo">Xuất báo cáo</button>
         </section>
@@ -83,6 +45,204 @@
     <footer>
         <p>Hệ thống quản lý dân cư - Bản quyền © 2023</p>
     </footer>
+
+    <!-- Modal cho hộ khẩu -->
+    <div id="householdModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Thông tin hộ khẩu</h3>
+            <form id="householdForm">
+                <label for="soHoKhau">Số hộ khẩu:</label>
+                <input type="text" id="soHoKhau" required aria-required="true">
+                
+                <label for="diaChiThuongTru">Địa chỉ thường trú:</label>
+                <input type="text" id="diaChiThuongTru" required aria-required="true">
+                
+                <label for="ngayCapHoKhau">Ngày cấp hộ khẩu:</label>
+                <input type="date" id="ngayCapHoKhau" required aria-required="true">
+                
+                <button type="button" onclick="addHousehold()" aria-label="Lưu thông tin hộ khẩu">Lưu thông tin</button>
+                <button type="button" onclick="hideHouseholdForm()" aria-label="Hủy">Hủy</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal cho nhân khẩu -->
+    <div id="individualModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Thông tin nhân khẩu</h3>
+            <form id="individualForm">
+                <label for="hoTen">Họ và tên:</label>
+                <input type="text" id="hoTen" required aria-required="true">
+                
+                <label for="biDanh">Bí danh:</label>
+                <input type="text" id="biDanh">
+                
+                <label for="ngaySinh">Ngày tháng năm sinh:</label>
+                <input type="date" id="ngaySinh" required aria-required="true">
+                
+                <label for="noiSinh">Nơi sinh:</label>
+                <input type="text" id="noiSinh" required aria-required="true">
+                
+                <label for="nguyenQuan">Nguyên quán:</label>
+                <input type="text" id="nguyenQuan" required aria-required="true">
+                
+                <label for="danToc">Dân tộc:</label>
+                <input type="text" id="danToc" required aria-required="true">
+                
+                <label for="ngheNghiep">Nghề nghiệp:</label>
+                <input type="text" id="ngheNghiep" required aria-required="true">
+                
+                <label for="noiLamViec">Nơi làm việc:</label>
+                <input type="text" id="noiLamViec">
+                
+                <label for="cmnd">Số CMND/CCCD:</label>
+                <input type="text" id="cmnd" required aria-required="true">
+                
+                <label for="ngayCapCMND">Ngày cấp CMND/CCCD:</label>
+                <input type="date" id="ngayCapCMND" required aria-required="true">
+                
+                <label for="noiCapCMND">Nơi cấp CMND/CCCD:</label>
+                <input type="text" id="noiCapCMND" required aria-required="true">
+                
+                <label for="ngayDangKyThuongTru">Ngày đăng ký thường trú:</label>
+                <input type="date" id="ngayDangKyThuongTru" required aria-required="true">
+                
+                <label for="diaChiTruocKhiChuyenDen">Địa chỉ trước khi chuyển đến:</label>
+                <input type="text" id="diaChiTruocKhiChuyenDen">
+                
+                <label for="quanHeVoiChuHo">Quan hệ với chủ hộ:</label>
+                <input type="text" id="quanHeVoiChuHo">
+                
+                <label for="laChuHo">Là chủ hộ:</label>
+                <input type="checkbox" id="laChuHo">
+                
+                <button type="button" onclick="addIndividual()" aria-label="Lưu thông tin nhân khẩu">Lưu thông tin</button>
+                <button type="button" onclick="hideIndividualForm()" aria-label="Hủy">Hủy</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thêm modal cho chỉnh sửa hộ khẩu -->
+    <div id="editHouseholdModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Chỉnh sửa thông tin hộ khẩu</h3>
+            <form id="editHouseholdForm" class="edit-form">
+                <input type="hidden" id="editHouseholdIndex">
+                <div class="form-group">
+                    <label for="editSoHoKhau">Số hộ khẩu:</label>
+                    <input type="text" id="editSoHoKhau" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editDiaChiThuongTru">Địa chỉ thường trú:</label>
+                    <input type="text" id="editDiaChiThuongTru" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNgayCapHoKhau">Ngày cấp hộ khẩu:</label>
+                    <input type="date" id="editNgayCapHoKhau" required aria-required="true">
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="updateHousehold()" aria-label="Cập nhật thông tin hộ khẩu">Cập nhật</button>
+                    <button type="button" onclick="closeModal('editHouseholdModal')" aria-label="Hủy">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thêm modal cho chỉnh sửa nhân khẩu -->
+    <div id="editIndividualModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Chỉnh sửa thông tin nhân khẩu</h3>
+            <form id="editIndividualForm" class="edit-form">
+                <input type="hidden" id="editIndividualIndex">
+                <div class="form-group">
+                    <label for="editHoTen">Họ và tên:</label>
+                    <input type="text" id="editHoTen" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editBiDanh">Bí danh:</label>
+                    <input type="text" id="editBiDanh">
+                </div>
+                <div class="form-group">
+                    <label for="editNgaySinh">Ngày tháng năm sinh:</label>
+                    <input type="date" id="editNgaySinh" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNoiSinh">Nơi sinh:</label>
+                    <input type="text" id="editNoiSinh" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNguyenQuan">Nguyên quán:</label>
+                    <input type="text" id="editNguyenQuan" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editDanToc">Dân tộc:</label>
+                    <input type="text" id="editDanToc" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNgheNghiep">Nghề nghiệp:</label>
+                    <input type="text" id="editNgheNghiep" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNoiLamViec">Nơi làm việc:</label>
+                    <input type="text" id="editNoiLamViec">
+                </div>
+                <div class="form-group">
+                    <label for="editCmnd">Số CMND/CCCD:</label>
+                    <input type="text" id="editCmnd" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNgayCapCMND">Ngày cấp CMND/CCCD:</label>
+                    <input type="date" id="editNgayCapCMND" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNoiCapCMND">Nơi cấp CMND/CCCD:</label>
+                    <input type="text" id="editNoiCapCMND" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editNgayDangKyThuongTru">Ngày đăng ký thường trú:</label>
+                    <input type="date" id="editNgayDangKyThuongTru" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editDiaChiTruocKhiChuyenDen">Địa chỉ trước khi chuyển đến:</label>
+                    <input type="text" id="editDiaChiTruocKhiChuyenDen">
+                </div>
+                <div class="form-group">
+                    <label for="editQuanHeVoiChuHo">Quan hệ với chủ hộ:</label>
+                    <input type="text" id="editQuanHeVoiChuHo">
+                </div>
+                <div class="form-group">
+                    <label for="editLaChuHo">Là chủ hộ:</label>
+                    <input type="checkbox" id="editLaChuHo">
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="updateIndividual()" aria-label="Cập nh��t thông tin nhân khẩu">Cập nhật</button>
+                    <button type="button" onclick="closeModal('editIndividualModal')" aria-label="Hủy">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal cho báo cáo -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="reportContent"></div>
+            <button onclick="exportReport()">Xuất báo cáo</button>
+        </div>
+    </div>
+
+    <!-- Thêm đoạn này vào cuối file, trước thẻ đóng </body> -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <!-- Nội dung chi tiết sẽ được thêm vào đây bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Đảm bảo rằng đường dẫn đến file scripts.js là chính xác -->
     <script src="scripts.js"></script>
 </body>
 </html>
