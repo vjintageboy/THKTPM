@@ -72,11 +72,12 @@ function updateHouseholdList() {
         li.className = 'household-item';
         li.innerHTML = `
             <div class="household-info">
-                <h4>${household.soHoKhau}</h4>
+                <h4>Số hộ khẩu: ${household.soHoKhau}</h4>
+                <p><strong>Chủ hộ:</strong> ${household.tenChuHo}</p>
                 <p><strong>Địa chỉ:</strong> ${household.diaChiThuongTru}</p>
-                <p><strong>Ngày cấp:</strong> ${household.ngayCapHoKhau}</p>
             </div>
             <div class="action-buttons">
+                <button onclick="showHouseholdDetails(${index})">Xem chi tiết</button>
                 <button onclick="showEditHouseholdForm(${index})">Sửa</button>
                 <button onclick="deleteHousehold(${index})">Xóa</button>
             </div>
@@ -100,10 +101,14 @@ function updateIndividualList() {
             <div class="individual-info">
                 <h4>${individual.hoTen} ${individual.laChuHo ? '(Chủ hộ)' : ''}</h4>
                 <p><strong>Ngày sinh:</strong> ${individual.ngaySinh}</p>
-                <p><strong>CMND:</strong> ${individual.cmnd}</p>
-                <p><strong>Nghề nghiệp:</strong> ${individual.ngheNghiep}</p>
+                <p><strong>Giới tính:</strong> ${individual.gioiTinh}</p>
+                <p><strong>Quan hệ với chủ hộ:</strong> ${individual.quanHeVoiChuHo}</p>
+                <p><strong>Số hộ khẩu:</strong> ${individual.soHoKhau}</p>
+                ${individual.cmnd ? `<p><strong>CMND:</strong> ${individual.cmnd}</p>` : ''}
+                ${individual.ngheNghiep ? `<p><strong>Nghề nghiệp:</strong> ${individual.ngheNghiep}</p>` : ''}
             </div>
             <div class="action-buttons">
+                <button onclick="showIndividualDetails(${index})">Xem chi tiết</button>
                 <button onclick="showEditIndividualForm(${index})">Sửa</button>
                 <button onclick="deleteIndividual(${index})">Xóa</button>
             </div>
@@ -116,6 +121,7 @@ function showEditHouseholdForm(index) {
     const household = households[index];
     document.getElementById('editHouseholdIndex').value = index;
     document.getElementById('editSoHoKhau').value = household.soHoKhau;
+    document.getElementById('editTenChuHo').value = household.tenChuHo;
     document.getElementById('editDiaChiThuongTru').value = household.diaChiThuongTru;
     document.getElementById('editNgayCapHoKhau').value = household.ngayCapHoKhau;
     showModal('editHouseholdModal');
@@ -124,12 +130,31 @@ function showEditHouseholdForm(index) {
 async function updateHousehold() {
     const index = document.getElementById('editHouseholdIndex').value;
     const soHoKhau = document.getElementById('editSoHoKhau').value;
+    const tenChuHo = document.getElementById('editTenChuHo').value;
     const diaChiThuongTru = document.getElementById('editDiaChiThuongTru').value;
     const ngayCapHoKhau = document.getElementById('editNgayCapHoKhau').value;
 
-    households[index] = { soHoKhau, diaChiThuongTru, ngayCapHoKhau };
+    households[index] = { soHoKhau, tenChuHo, diaChiThuongTru, ngayCapHoKhau };
+
+    // Cập nhật thông tin chủ hộ trong danh sách individuals
+    const individualIndex = individuals.findIndex(individual => individual.soHoKhau === soHoKhau && individual.laChuHo);
+    if (individualIndex !== -1) {
+        individuals[individualIndex].hoTen = tenChuHo;
+    } else {
+        // Nếu không tìm thấy chủ hộ, thêm mới
+        individuals.push({
+            hoTen: tenChuHo,
+            soHoKhau: soHoKhau,
+            laChuHo: true,
+            ngaySinh: '', // Có thể cập nhật sau
+            cmnd: '', // Có thể cập nhật sau
+            ngheNghiep: '' // Có thể cập nhật sau
+        });
+    }
+
     await writeData();
     updateHouseholdList();
+    updateIndividualList();
     closeModal('editHouseholdModal');
     showNotification('Cập nhật hộ khẩu thành công!');
 }
@@ -270,6 +295,7 @@ window.addEventListener('load', function() {
 
 function clearHouseholdForm() {
     document.getElementById('soHoKhau').value = '';
+    document.getElementById('tenChuHo').value = '';
     document.getElementById('diaChiThuongTru').value = '';
     document.getElementById('ngayCapHoKhau').value = '';
 }
@@ -278,18 +304,34 @@ function clearHouseholdForm() {
 async function addHousehold() {
     console.log('addHousehold called');
     const soHoKhau = document.getElementById('soHoKhau').value;
+    const tenChuHo = document.getElementById('tenChuHo').value;
     const diaChiThuongTru = document.getElementById('diaChiThuongTru').value;
     const ngayCapHoKhau = document.getElementById('ngayCapHoKhau').value;
 
-    console.log('Household data:', { soHoKhau, diaChiThuongTru, ngayCapHoKhau });
+    console.log('Household data:', { soHoKhau, tenChuHo, diaChiThuongTru, ngayCapHoKhau });
 
     const householdData = {
         soHoKhau,
+        tenChuHo,
         diaChiThuongTru,
-        ngayCapHoKhau
+        ngayCapHoKhau,
+        thanhVien: [tenChuHo] // Thêm chủ hộ vào danh sách thành viên
     };
 
     households.push(householdData);
+
+    // Thêm chủ hộ vào danh sách individuals
+    individuals.push({
+        hoTen: tenChuHo,
+        soHoKhau: soHoKhau,
+        quanHeVoiChuHo: 'Chủ hộ',
+        laChuHo: true,
+        ngaySinh: '', // Có thể thêm trường này vào form nếu cần
+        gioiTinh: '', // Có thể thêm trường này vào form nếu cần
+        cmnd: '', // Có thể thêm trường này vào form nếu cần
+        ngheNghiep: '' // Có thể thêm trường này vào form nếu cần
+    });
+
     await writeData();
     updateHouseholdList();
     showNotification('Thêm hộ khẩu thành công!');
@@ -297,67 +339,89 @@ async function addHousehold() {
     clearHouseholdForm();
 }
 
+function toggleNewbornFields() {
+    const laMoiSinh = document.getElementById('laMoiSinh').checked;
+    const adultFields = document.getElementById('adultFields');
+    adultFields.style.display = laMoiSinh ? 'none' : 'block';
+}
+
+async function addIndividual() {
+    const laMoiSinh = document.getElementById('laMoiSinh').checked;
+    const hoTen = document.getElementById('hoTen').value;
+    const ngaySinh = document.getElementById('ngaySinh').value;
+    const gioiTinh = document.getElementById('gioiTinh').value;
+    const quanHeVoiChuHo = document.getElementById('quanHeVoiChuHo').value;
+    const soHoKhau = document.getElementById('soHoKhau').value;
+
+    const individual = {
+        hoTen,
+        ngaySinh,
+        gioiTinh,
+        quanHeVoiChuHo,
+        soHoKhau,
+        biDanh: '',
+        noiSinh: laMoiSinh ? 'Mới sinh' : '',
+        nguyenQuan: '',
+        danToc: '',
+        ngayDangKyThuongTru: new Date().toISOString().split('T')[0], // Ngày hiện tại
+        laChuHo: false
+    };
+
+    if (laMoiSinh) {
+        individual.ngheNghiep = '';
+        individual.noiLamViec = '';
+        individual.cmnd = '';
+        individual.ngayCapCMND = '';
+        individual.noiCapCMND = '';
+        individual.diaChiTruocKhiChuyenDen = 'Mới sinh';
+    } else {
+        individual.ngheNghiep = document.getElementById('ngheNghiep').value;
+        individual.noiLamViec = document.getElementById('noiLamViec').value;
+        individual.cmnd = document.getElementById('cmnd').value;
+        individual.ngayCapCMND = document.getElementById('ngayCapCMND').value;
+        individual.noiCapCMND = document.getElementById('noiCapCMND').value;
+        individual.diaChiTruocKhiChuyenDen = document.getElementById('diaChiTruocKhiChuyenDen').value;
+    }
+
+    individuals.push(individual);
+
+    // Cập nhật hộ khẩu tương ứng
+    const household = households.find(h => h.soHoKhau === soHoKhau);
+    if (household) {
+        if (!household.thanhVien) {
+            household.thanhVien = [];
+        }
+        household.thanhVien.push(individual.hoTen);
+    }
+
+    await writeData();
+    updateIndividualList();
+    updateHouseholdList();
+    showNotification('Thêm nhân khẩu thành công!');
+    closeModal('individualModal');
+    clearIndividualForm();
+}
+
 function clearIndividualForm() {
+    document.getElementById('laMoiSinh').checked = false;
     document.getElementById('hoTen').value = '';
-    document.getElementById('biDanh').value = '';
     document.getElementById('ngaySinh').value = '';
-    document.getElementById('noiSinh').value = '';
-    document.getElementById('nguyenQuan').value = '';
-    document.getElementById('danToc').value = '';
+    document.getElementById('gioiTinh').value = 'Nam';
+    document.getElementById('quanHeVoiChuHo').value = '';
+    document.getElementById('soHoKhau').value = '';
     document.getElementById('ngheNghiep').value = '';
     document.getElementById('noiLamViec').value = '';
     document.getElementById('cmnd').value = '';
     document.getElementById('ngayCapCMND').value = '';
     document.getElementById('noiCapCMND').value = '';
-    document.getElementById('ngayDangKyThuongTru').value = '';
     document.getElementById('diaChiTruocKhiChuyenDen').value = '';
-    document.getElementById('quanHeVoiChuHo').value = '';
-    document.getElementById('laChuHo').checked = false;
+    toggleNewbornFields();
 }
 
-// Cập nhật hàm addIndividual
-async function addIndividual() {
-    const hoTen = document.getElementById('hoTen').value;
-    const biDanh = document.getElementById('biDanh').value;
-    const ngaySinh = document.getElementById('ngaySinh').value;
-    const noiSinh = document.getElementById('noiSinh').value;
-    const nguyenQuan = document.getElementById('nguyenQuan').value;
-    const danToc = document.getElementById('danToc').value;
-    const ngheNghiep = document.getElementById('ngheNghiep').value;
-    const noiLamViec = document.getElementById('noiLamViec').value;
-    const cmnd = document.getElementById('cmnd').value;
-    const ngayCapCMND = document.getElementById('ngayCapCMND').value;
-    const noiCapCMND = document.getElementById('noiCapCMND').value;
-    const ngayDangKyThuongTru = document.getElementById('ngayDangKyThuongTru').value;
-    const diaChiTruocKhiChuyenDen = document.getElementById('diaChiTruocKhiChuyenDen').value;
-    const quanHeVoiChuHo = document.getElementById('quanHeVoiChuHo').value;
-    const laChuHo = document.getElementById('laChuHo').checked;
-
-    const individual = {
-        hoTen,
-        biDanh,
-        ngaySinh,
-        noiSinh,
-        nguyenQuan,
-        danToc,
-        ngheNghiep,
-        noiLamViec,
-        cmnd,
-        ngayCapCMND,
-        noiCapCMND,
-        ngayDangKyThuongTru,
-        diaChiTruocKhiChuyenDen,
-        quanHeVoiChuHo,
-        laChuHo
-    };
-
-    individuals.push(individual);
-    await writeData();
-    updateIndividualList();
-    showNotification('Thêm nhân khẩu thành công!');
-    closeModal('individualModal');
-    clearIndividualForm();
-}
+// Thêm hàm này vào cuối file
+window.addEventListener('load', function() {
+    document.getElementById('laMoiSinh').addEventListener('change', toggleNewbornFields);
+});
 
 function showNotification(message, isError = false) {
     const notification = document.getElementById('notification');
@@ -473,4 +537,67 @@ function exportReport() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+}
+
+function showIndividualDetails(index) {
+    const individual = individuals[index];
+    const detailsHTML = `
+        <h3>Chi tiết nhân khẩu</h3>
+        <p><strong>Họ và tên:</strong> ${individual.hoTen}</p>
+        <p><strong>Bí danh:</strong> ${individual.biDanh || 'Không có'}</p>
+        <p><strong>Ngày sinh:</strong> ${individual.ngaySinh}</p>
+        <p><strong>Nơi sinh:</strong> ${individual.noiSinh}</p>
+        <p><strong>Nguyên quán:</strong> ${individual.nguyenQuan}</p>
+        <p><strong>Dân tộc:</strong> ${individual.danToc}</p>
+        <p><strong>Nghề nghiệp:</strong> ${individual.ngheNghiep}</p>
+        <p><strong>Nơi làm việc:</strong> ${individual.noiLamViec || 'Không có'}</p>
+        <p><strong>CMND/CCCD:</strong> ${individual.cmnd}</p>
+        <p><strong>Ngày cấp CMND/CCCD:</strong> ${individual.ngayCapCMND}</p>
+        <p><strong>Nơi cấp CMND/CCCD:</strong> ${individual.noiCapCMND}</p>
+        <p><strong>Ngày đăng ký thường trú:</strong> ${individual.ngayDangKyThuongTru}</p>
+        <p><strong>Địa chỉ trước khi chuyển đến:</strong> ${individual.diaChiTruocKhiChuyenDen || 'Không có'}</p>
+        <p><strong>Quan hệ với chủ hộ:</strong> ${individual.quanHeVoiChuHo || 'Không có'}</p>
+        <p><strong>Là chủ hộ:</strong> ${individual.laChuHo ? 'Có' : 'Không'}</p>
+    `;
+    showModal('detailsModal', detailsHTML);
+}
+
+// Cập nhật hàm showModal để hỗ trợ nội dung tùy chỉnh
+function showModal(modalId, content = null) {
+    const modal = document.getElementById(modalId);
+    if (content) {
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.innerHTML = content;
+    }
+    modal.style.display = 'block';
+}
+
+function showHouseholdDetails(index) {
+    const household = households[index];
+    const householdMembers = individuals.filter(individual => individual.soHoKhau === household.soHoKhau);
+    
+    let detailsHTML = `
+        <h3>Chi tiết hộ khẩu</h3>
+        <p><strong>Số hộ khẩu:</strong> ${household.soHoKhau}</p>
+        <p><strong>Chủ hộ:</strong> ${household.tenChuHo}</p>
+        <p><strong>Địa chỉ:</strong> ${household.diaChiThuongTru}</p>
+        <p><strong>Ngày cấp:</strong> ${household.ngayCapHoKhau}</p>
+        <h4>Thành viên trong hộ:</h4>
+        <ul>
+    `;
+    
+    householdMembers.forEach((member, memberIndex) => {
+        detailsHTML += `
+            <li>
+                ${member.hoTen} (${member.quanHeVoiChuHo})
+                <button onclick="showIndividualDetails(${individuals.indexOf(member)})">Xem chi tiết</button>
+            </li>
+        `;
+    });
+    
+    detailsHTML += `
+        </ul>
+    `;
+    
+    showModal('detailsModal', detailsHTML);
 }

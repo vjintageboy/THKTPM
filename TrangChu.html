@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="House.png" type="image/x-icon">
     <title>Quản lý dân cư</title>
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="Logo" class="logo">
+        <img src="House.png" alt="Logo" class="logo">
         <h1>Phần mềm quản lý dân cư</h1>
         <nav>
             <ul>
@@ -55,6 +56,9 @@
                 <label for="soHoKhau">Số hộ khẩu:</label>
                 <input type="text" id="soHoKhau" required aria-required="true">
                 
+                <label for="tenChuHo">Họ tên chủ hộ:</label>
+                <input type="text" id="tenChuHo" required aria-required="true">
+                
                 <label for="diaChiThuongTru">Địa chỉ thường trú:</label>
                 <input type="text" id="diaChiThuongTru" required aria-required="true">
                 
@@ -71,52 +75,48 @@
     <div id="individualModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>Thông tin nhân khẩu</h3>
+            <h3>Thông tin nhân khẩu mới</h3>
             <form id="individualForm">
+                <label for="laMoiSinh">Là trẻ mới sinh:</label>
+                <input type="checkbox" id="laMoiSinh" onchange="toggleNewbornFields()">
+                
                 <label for="hoTen">Họ và tên:</label>
                 <input type="text" id="hoTen" required aria-required="true">
-                
-                <label for="biDanh">Bí danh:</label>
-                <input type="text" id="biDanh">
                 
                 <label for="ngaySinh">Ngày tháng năm sinh:</label>
                 <input type="date" id="ngaySinh" required aria-required="true">
                 
-                <label for="noiSinh">Nơi sinh:</label>
-                <input type="text" id="noiSinh" required aria-required="true">
-                
-                <label for="nguyenQuan">Nguyên quán:</label>
-                <input type="text" id="nguyenQuan" required aria-required="true">
-                
-                <label for="danToc">Dân tộc:</label>
-                <input type="text" id="danToc" required aria-required="true">
-                
-                <label for="ngheNghiep">Nghề nghiệp:</label>
-                <input type="text" id="ngheNghiep" required aria-required="true">
-                
-                <label for="noiLamViec">Nơi làm việc:</label>
-                <input type="text" id="noiLamViec">
-                
-                <label for="cmnd">Số CMND/CCCD:</label>
-                <input type="text" id="cmnd" required aria-required="true">
-                
-                <label for="ngayCapCMND">Ngày cấp CMND/CCCD:</label>
-                <input type="date" id="ngayCapCMND" required aria-required="true">
-                
-                <label for="noiCapCMND">Nơi cấp CMND/CCCD:</label>
-                <input type="text" id="noiCapCMND" required aria-required="true">
-                
-                <label for="ngayDangKyThuongTru">Ngày đăng ký thường trú:</label>
-                <input type="date" id="ngayDangKyThuongTru" required aria-required="true">
-                
-                <label for="diaChiTruocKhiChuyenDen">Địa chỉ trước khi chuyển đến:</label>
-                <input type="text" id="diaChiTruocKhiChuyenDen">
+                <label for="gioiTinh">Giới tính:</label>
+                <select id="gioiTinh" required aria-required="true">
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                </select>
                 
                 <label for="quanHeVoiChuHo">Quan hệ với chủ hộ:</label>
-                <input type="text" id="quanHeVoiChuHo">
+                <input type="text" id="quanHeVoiChuHo" required aria-required="true">
                 
-                <label for="laChuHo">Là chủ hộ:</label>
-                <input type="checkbox" id="laChuHo">
+                <label for="soHoKhau">Số hộ khẩu:</label>
+                <input type="text" id="soHoKhau" required aria-required="true">
+                
+                <div id="adultFields">
+                    <label for="ngheNghiep">Nghề nghiệp:</label>
+                    <input type="text" id="ngheNghiep">
+                    
+                    <label for="noiLamViec">Nơi làm việc:</label>
+                    <input type="text" id="noiLamViec">
+                    
+                    <label for="cmnd">Số CMND/CCCD:</label>
+                    <input type="text" id="cmnd">
+                    
+                    <label for="ngayCapCMND">Ngày cấp CMND/CCCD:</label>
+                    <input type="date" id="ngayCapCMND">
+                    
+                    <label for="noiCapCMND">Nơi cấp CMND/CCCD:</label>
+                    <input type="text" id="noiCapCMND">
+                    
+                    <label for="diaChiTruocKhiChuyenDen">Địa chỉ trước khi chuyển đến:</label>
+                    <input type="text" id="diaChiTruocKhiChuyenDen">
+                </div>
                 
                 <button type="button" onclick="addIndividual()" aria-label="Lưu thông tin nhân khẩu">Lưu thông tin</button>
                 <button type="button" onclick="hideIndividualForm()" aria-label="Hủy">Hủy</button>
@@ -134,6 +134,10 @@
                 <div class="form-group">
                     <label for="editSoHoKhau">Số hộ khẩu:</label>
                     <input type="text" id="editSoHoKhau" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="editTenChuHo">Tên chủ hộ:</label>
+                    <input type="text" id="editTenChuHo" required aria-required="true">
                 </div>
                 <div class="form-group">
                     <label for="editDiaChiThuongTru">Địa chỉ thường trú:</label>
@@ -219,7 +223,7 @@
                     <input type="checkbox" id="editLaChuHo">
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="updateIndividual()" aria-label="Cập nh��t thông tin nhân khẩu">Cập nhật</button>
+                    <button type="button" onclick="updateIndividual()" aria-label="Cập nhật thông tin nhân khẩu">Cập nhật</button>
                     <button type="button" onclick="closeModal('editIndividualModal')" aria-label="Hủy">Hủy</button>
                 </div>
             </form>
@@ -238,6 +242,7 @@
     <!-- Thêm đoạn này vào cuối file, trước thẻ đóng </body> -->
     <div id="detailsModal" class="modal">
         <div class="modal-content">
+            <span class="close">&times;</span>
             <!-- Nội dung chi tiết sẽ được thêm vào đây bằng JavaScript -->
         </div>
     </div>
