@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Quản lý dân cư</title>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo" class="logo"> <!-- Placeholder for logo -->
+        <h1>Phần mềm quản lý dân cư</h1>
+        <nav>
+            <ul>
+                <li><a href="#hoKhau">Quản lý hộ khẩu</a></li>
+                <li><a href="#nhanKhau">Quản lý nhân khẩu</a></li>
+                <li><a href="#baoCao">Báo cáo và thống kê</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="notification" style="display:none;" role="alert"></div> <!-- Notification area -->
+        <section id="hoKhau" role="region" aria-labelledby="hoKhau">
+            <h2 id="hoKhau">Quản lý hộ khẩu</h2>
+            <button onclick="showAddHouseholdForm()" aria-label="Thêm mới hộ khẩu">Thêm mới hộ khẩu</button>
+            <button onclick="showEditHouseholdForm()" aria-label="Sửa đổi thông tin hộ khẩu">Sửa đổi thông tin hộ khẩu</button>
+            <button onclick="deleteHousehold()" aria-label="Xóa hộ khẩu">Xóa hộ khẩu</button>
+            <form id="householdForm" style="display:none;">
+                <h3>Thông tin hộ khẩu</h3>
+                <label for="soHoKhau">Số hộ khẩu:</label>
+                <input type="text" id="soHoKhau" required aria-required="true" aria-describedby="soHoKhauDesc">
+                <span id="soHoKhauDesc">Nhập số hộ khẩu của gia đình.</span>
+                
+                <label for="tenChuHo">Tên chủ hộ:</label>
+                <input type="text" id="tenChuHo" required aria-required="true" aria-describedby="tenChuHoDesc">
+                <span id="tenChuHoDesc">Nhập tên của chủ hộ.</span>
+                
+                <label for="diaChi">Địa chỉ:</label>
+                <input type="text" id="diaChi" required aria-required="true" aria-describedby="diaChiDesc">
+                <span id="diaChiDesc">Nhập địa chỉ (số nhà, đường, phường, quận).</span>
+                
+                <button type="button" onclick="addHousehold()" aria-label="Lưu thông tin hộ khẩu">Lưu thông tin</button>
+                <button type="button" onclick="hideHouseholdForm()" aria-label="Hủy">Hủy</button>
+            </form>
+        </section>
+        <section id="nhanKhau" role="region" aria-labelledby="nhanKhau">
+            <h2 id="nhanKhau">Quản lý nhân khẩu</h2>
+            <button onclick="showAddIndividualForm()" aria-label="Thêm mới nhân khẩu">Thêm mới nhân khẩu</button>
+            <button onclick="showEditIndividualForm()" aria-label="Cập nhật nhân khẩu">Cập nhật nhân khẩu</button>
+            <button onclick="deleteIndividual()" aria-label="Xóa nhân khẩu">Xóa nhân khẩu</button>
+            <form id="individualForm" style="display:none;">
+                <h3>Thông tin nhân khẩu</h3>
+                <label for="hoTen">Họ tên:</label>
+                <input type="text" id="hoTen" required aria-required="true" aria-describedby="hoTenDesc">
+                <span id="hoTenDesc">Nhập họ tên của nhân khẩu.</span>
+                
+                <label for="ngaySinh">Ngày sinh:</label>
+                <input type="date" id="ngaySinh" required aria-required="true" aria-describedby="ngaySinhDesc">
+                <span id="ngaySinhDesc">Chọn ngày sinh của nhân khẩu.</span>
+                
+                <label for="ngheNghiep">Nghề nghiệp:</label>
+                <input type="text" id="ngheNghiep" required aria-required="true" aria-describedby="ngheNghiepDesc">
+                <span id="ngheNghiepDesc">Nhập nghề nghiệp của nhân khẩu.</span>
+                
+                <label for="cmnd">Số CMND:</label>
+                <input type="text" id="cmnd" required aria-required="true" aria-describedby="cmndDesc">
+                <span id="cmndDesc">Nhập số CMND của nhân khẩu.</span>
+                
+                <label for="moiQuanHe">Mối quan hệ với chủ hộ:</label>
+                <input type="text" id="moiQuanHe" required aria-required="true" aria-describedby="moiQuanHeDesc">
+                <span id="moiQuanHeDesc">Nhập mối quan hệ với chủ hộ.</span>
+                
+                <button type="button" onclick="addIndividual()" aria-label="Lưu thông tin nhân khẩu">Lưu thông tin</button>
+                <button type="button" onclick="hideIndividualForm()" aria-label="Hủy">Hy</button>
+            </form>
+        </section>
+        <section id="baoCao" role="region" aria-labelledby="baoCao">
+            <h2 id="baoCao">Báo cáo và thống kê</h2>
+            <button onclick="generateReport()" aria-label="Thống kê nhân khẩu">Thống kê nhân khẩu</button>
+            <button onclick="exportReport()" aria-label="Xuất báo cáo">Xuất báo cáo</button>
+        </section>
+    </main>
+    <footer>
+        <p>Hệ thống quản lý dân cư - Bản quyền © 2023</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

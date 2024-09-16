@@ -17,18 +17,28 @@ function clearHouseholdForm() {
 }
 
 function addHousehold() {
-    const soHoKhau = document.getElementById('soHoKhau').value;
-    const tenChuHo = document.getElementById('tenChuHo').value;
-    const diaChi = document.getElementById('diaChi').value;
+    const soHoKhau = document.getElementById('soHoKhau').value.trim();
+    const tenChuHo = document.getElementById('tenChuHo').value.trim();
+    const diaChi = document.getElementById('diaChi').value.trim();
 
-    if (soHoKhau && tenChuHo && diaChi) {
-        const household = { soHoKhau, tenChuHo, diaChi };
-        households.push(household);
-        alert("Đã thêm hộ khẩu: " + JSON.stringify(household));
-        hideHouseholdForm();
-    } else {
-        alert("Vui lòng nhập đầy đủ thông tin.");
+    // Input validation
+    if (!soHoKhau) {
+        showNotification("Vui lòng nhập số hộ khẩu.", true);
+        return;
     }
+    if (!tenChuHo) {
+        showNotification("Vui lòng nhập tên chủ hộ.", true);
+        return;
+    }
+    if (!diaChi) {
+        showNotification("Vui lòng nhập địa chỉ.", true);
+        return;
+    }
+
+    const household = { soHoKhau, tenChuHo, diaChi };
+    households.push(household);
+    showNotification("Đã thêm hộ khẩu: " + JSON.stringify(household));
+    hideHouseholdForm();
 }
 
 function showAddIndividualForm() {
@@ -49,20 +59,54 @@ function clearIndividualForm() {
 }
 
 function addIndividual() {
-    const hoTen = document.getElementById('hoTen').value;
+    const hoTen = document.getElementById('hoTen').value.trim();
     const ngaySinh = document.getElementById('ngaySinh').value;
-    const ngheNghiep = document.getElementById('ngheNghiep').value;
-    const cmnd = document.getElementById('cmnd').value;
-    const moiQuanHe = document.getElementById('moiQuanHe').value;
+    const ngheNghiep = document.getElementById('ngheNghiep').value.trim();
+    const cmnd = document.getElementById('cmnd').value.trim();
+    const moiQuanHe = document.getElementById('moiQuanHe').value.trim();
 
-    if (hoTen && ngaySinh && ngheNghiep && cmnd && moiQuanHe) {
-        const individual = { hoTen, ngaySinh, ngheNghiep, cmnd, moiQuanHe };
-        individuals.push(individual);
-        alert("Đã thêm nhân khẩu: " + JSON.stringify(individual));
-        hideIndividualForm();
-    } else {
-        alert("Vui lòng nhập đầy đủ thông tin.");
+    // Input validation
+    if (!hoTen) {
+        showNotification("Vui lòng nhập họ tên.", true);
+        return;
     }
+    if (!ngaySinh) {
+        showNotification("Vui lòng chọn ngày sinh.", true);
+        return;
+    }
+    if (!ngheNghiep) {
+        showNotification("Vui lòng nhập nghề nghiệp.", true);
+        return;
+    }
+    if (!cmnd) {
+        showNotification("Vui lòng nhập số CMND.", true);
+        return;
+    }
+    if (!moiQuanHe) {
+        showNotification("Vui lòng nhập mối quan hệ với chủ hộ.", true);
+        return;
+    }
+
+    const individual = { hoTen, ngaySinh, ngheNghiep, cmnd, moiQuanHe };
+    individuals.push(individual);
+    showNotification("Đã thêm nhân khẩu: " + JSON.stringify(individual));
+    hideIndividualForm();
+}
+
+function showNotification(message, isError = false) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+    notification.style.color = isError ? 'red' : 'green';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000); // Hide after 3 seconds
+}
+
+function logout() {
+    // Clear any session data if applicable
+    // Redirect to login page
+    window.location.href = 'TrangChu.html'; // Change to your login page
 }
 
 function showEditIndividualForm() {
