@@ -452,7 +452,6 @@ function logout() {
     // Redirect to login page
     window.location.href = 'TrangChu.html'; // Change to your login page
 }
-
 function generateReport() {
     const totalHouseholds = households.length;
     const totalIndividuals = individuals.length;
@@ -474,7 +473,7 @@ function generateReport() {
         occupations[individual.ngheNghiep] = (occupations[individual.ngheNghiep] || 0) + 1;
     });
 
-    const report = `
+     const report = `
         <h3>Báo cáo thống kê dân cư</h3>
         <p>Tổng số hộ khẩu: ${totalHouseholds}</p>
         <p>Tổng số nhân khẩu: ${totalIndividuals}</p>
