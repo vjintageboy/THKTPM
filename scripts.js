@@ -41,6 +41,25 @@ async function readData() {
 // Cập nhật hàm writeData để gửi dữ liệu đến server
 async function writeData() {
     try {
+        // Format date fields before sending to the server
+        households.forEach(household => {
+            if (household.ngay_cap_ho_khau) {
+                household.ngay_cap_ho_khau = new Date(household.ngay_cap_ho_khau).toISOString().split('T')[0];
+            }
+        });
+
+        individuals.forEach(individual => {
+            if (individual.ngay_sinh) {
+                individual.ngay_sinh = new Date(individual.ngay_sinh).toISOString().split('T')[0];
+            }
+            if (individual.ngay_cap_cmnd) {
+                individual.ngay_cap_cmnd = new Date(individual.ngay_cap_cmnd).toISOString().split('T')[0];
+            }
+            if (individual.ngay_dang_ky_thuong_tru) {
+                individual.ngay_dang_ky_thuong_tru = new Date(individual.ngay_dang_ky_thuong_tru).toISOString().split('T')[0];
+            }
+        });
+
         console.log('Sending data:', { households, individuals });
         const response = await fetch(`${API_BASE_URL}/api/save`, {
             method: 'POST',
