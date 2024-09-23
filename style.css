@@ -1,4 +1,12 @@
 /* General Styles */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --background-color: #f5f7fa;
+    --text-color: #34495e;
+    --border-radius: 8px;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,42 +14,40 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     line-height: 1.6;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--background-color);
+    color: var(--text-color);
     padding: 0 20px;
 }
 
 /* Header */
 header {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: #fff;
     padding: 20px 0;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 header .logo {
-    width: 100px; /* Adjust size as needed */
-    margin-bottom: 10px;
+    width: 80px;
+    margin-bottom: 15px;
 }
 
 header h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    font-weight: 700;
 }
 
 /* Navigation */
-nav {
-    margin-bottom: 20px;
-}
-
 nav ul {
     list-style: none;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    flex-wrap: wrap;
 }
 
 nav ul li {
@@ -51,73 +57,85 @@ nav ul li {
 nav ul li a {
     text-decoration: none;
     color: #fff;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1.1rem;
     padding: 10px 20px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    border-radius: var(--border-radius);
 }
 
 nav ul li a:hover {
-    background-color: #0056b3;
-    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Main Content */
 main {
-    margin: 20px 0;
-}
-
-main h2 {
-    color: #333;
-    margin-bottom: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 section {
     background-color: #fff;
-    padding: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+section h2 {
+    color: var(--primary-color);
     margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.8rem;
 }
 
 /* Buttons */
 button {
-    background-color: #28a745;
+    background-color: var(--secondary-color);
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 20px;
     font-size: 1rem;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
-    margin-right: 10px;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #27ae60;
 }
 
 /* Form Styles */
-#householdForm, #individualForm {
+form {
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-#householdForm input, #individualForm input {
+form label {
     display: block;
-    margin: 10px 0;
-    padding: 8px;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="date"],
+form select {
     width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
 }
 
 /* Footer */
 footer {
     text-align: center;
-    padding: 10px;
-    background-color: #007bff;
+    padding: 15px;
+    background-color: var(--primary-color);
     color: #fff;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 footer p {
@@ -125,98 +143,46 @@ footer p {
     font-size: 0.9rem;
 }
 
-/* Search Bar Styles */
-.search-bar {
-    margin-bottom: 20px;
-}
-
-.search-bar input {
-    padding: 8px;
-    width: 70%;
-    margin-right: 10px;
-}
-
-#householdList {
+/* List Styles */
+#householdList, #individualList {
     list-style-type: none;
     padding: 0;
 }
 
-#householdList li {
-    background-color: #f9f9f9;
+.household-item, .individual-item {
+    background-color: #fff;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.household-info h4, .individual-info h4 {
+    color: var(--primary-color);
     margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
 }
 
-/* Media Queries for Responsive Design */
-
-/* Mobile devices and small screens (max-width: 600px) */
-@media (max-width: 600px) {
-    body {
-        padding: 0 10px;
-    }
-    
-    header h1 {
-        font-size: 1.5rem;
-    }
-    
-    nav ul {
-        flex-direction: column; /* Stack navigation links vertically */
-    }
-    
-    nav ul li {
-        margin: 10px 0; /* Add spacing between vertical links */
-    }
-
-    nav ul li a {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-
-    main {
-        margin: 10px 0;
-    }
-
-    section {
-        padding: 15px;
-    }
-
-    button {
-        width: 100%; /* Full width buttons on small screens */
-        margin-bottom: 10px;
-    }
-
-    .search-bar input {
-        width: 100%; /* Full width search bar on small screens */
-        margin: 0 0 10px 0;
-    }
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-/* Tablets and medium screens (max-width: 900px) */
-@media (max-width: 900px) {
-    header h1 {
-        font-size: 1.75rem;
-    }
-
-    nav ul li {
-        margin: 0 10px;
-    }
-
-    nav ul li a {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-
-    section {
-        padding: 20px;
-    }
+.action-buttons button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 80px;
 }
 
 /* Modal Styles */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -226,107 +192,108 @@ footer p {
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #fff;
     margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
     max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
+    position: relative;
 }
 
 .close {
     color: #aaa;
-    float: right;
+    position: absolute;
+    top: 10px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #000;
     text-decoration: none;
-    cursor: pointer;
 }
 
-/* Thêm vào cuối file style.css */
-#householdList, #individualList {
-    list-style-type: none;
-    padding: 0;
-}
-
-.household-item, .individual-item {
-    background-color: #f9f9f9;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.household-info, .individual-info {
-    flex-grow: 1;
-}
-
-.household-info h4, .individual-info h4 {
-    margin: 0 0 5px 0;
-    color: #007bff;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 5px;
-}
-
-.action-buttons button {
-    padding: 5px 10px;
-    font-size: 0.9rem;
-}
-
-/* Style cho modal chi tiết */
-#detailsModal .modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-}
-
-#detailsModal h3 {
-    margin-top: 0;
-    color: #007bff;
-}
-
-#detailsModal p {
-    margin: 10px 0;
-}
-
-/* Responsive design */
+/* Responsive Design */
 @media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin: 10px 0;
+    }
+
     .household-item, .individual-item {
         flex-direction: column;
         align-items: flex-start;
     }
 
     .action-buttons {
-        margin-top: 10px;
+        margin-top: 15px;
         align-self: flex-end;
+    }
+
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
     }
 }
 
-/* Thêm đoạn code sau vào cuối file style.css */
+/* Additional styles for better readability and structure */
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
 
 #reportContent {
-    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 #reportContent h3, #reportContent h4 {
-    margin-top: 15px;
-    margin-bottom: 10px; 
+    color: var(--primary-color);
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
 
 #reportContent ul {
@@ -335,57 +302,92 @@ footer p {
 }
 
 #reportContent li {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
-/* Thêm vào cuối file style.css */
+/* Thêm style cho thông báo */
+#notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    background-color: #4CAF50;
+    color: white;
+    z-index: 1001;
+    display: none;
+}
 
-.edit-form {
+.management-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    justify-content: space-around;
+    margin-bottom: 20px;
 }
 
-.form-group {
+.lists-container {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
 }
 
-.form-group label {
-    margin-bottom: 5px;
-    font-weight: bold;
+.list-section {
+    width: 48%;
 }
 
-.form-group input[type="text"],
-.form-group input[type="date"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+#reportContent {
     margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
 }
 
-.form-actions button {
-    padding: 10px 20px;
+@media (max-width: 768px) {
+    .lists-container {
+        flex-direction: column;
+    }
+
+    .list-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
 }
 
-/* Thêm đoạn code sau vào cuối file style.css */
-.modal-content .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+.household-item {
+    background-color: #fff;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.modal-content .close:hover,
-.modal-content .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+.household-info h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.action-buttons {
+    margin-top: 10px;
+}
+
+.action-buttons button {
+    margin-right: 10px;
+}
+
+#detailsModal .modal-content {
+    max-width: 800px;
+}
+
+#detailsModal ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#detailsModal li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+}
+
+#detailsModal button {
+    margin-left: 10px;
 }
