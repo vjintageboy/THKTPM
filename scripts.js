@@ -32,7 +32,7 @@ async function readData() {
             console.warn('Không có dữ liệu từ server');
         }
     } catch (error) {
-        console.error('Lỗi khi đọc dữ liệu:', error);
+        console.error('Lỗi khi đc dữ liệu:', error);
     }
     updateHouseholdList();
     updateIndividualList();
@@ -104,7 +104,6 @@ function updateHouseholdList() {
     }
     householdList.innerHTML = '';
     households.forEach((household, index) => {
-        console.log('Processing household:', household); // Thêm dòng này
         const li = document.createElement('li');
         li.className = 'household-item';
         li.innerHTML = `
@@ -131,27 +130,37 @@ function updateIndividualList() {
         return;
     }
     individualList.innerHTML = '';
-    individuals.forEach((individual, index) => {
-        const li = document.createElement('li');
-        li.className = 'individual-item';
-        li.innerHTML = `
-            <div class="individual-info">
-                <h4>${individual.ho_ten} ${individual.la_chu_ho ? '(Chủ hộ)' : ''}</h4>
-                <p><strong>Ngày sinh:</strong> ${individual.ngay_sinh.split('T')[0]}</p>
-                <p><strong>Giới tính:</strong> ${individual.gioi_tinh}</p>
-                <p><strong>Quan hệ với chủ hộ:</strong> ${individual.quan_he_voi_chu_ho}</p>
-                <p><strong>Số hộ khẩu:</strong> ${individual.so_ho_khau}</p>
-                ${individual.cmnd ? `<p><strong>CMND:</strong> ${individual.cmnd}</p>` : ''}
-                ${individual.nghe_nghiep ? `<p><strong>Nghề nghiệp:</strong> ${individual.nghe_nghiep}</p>` : ''}
-            </div>
-            <div class="action-buttons">
-                <button onclick="showIndividualDetails(${index})">Xem chi tiết</button>
-                <button onclick="showEditIndividualForm(${index})">Sửa</button>
-                <button onclick="deleteIndividual(${index})">Xóa</button>
-            </div>
-        `;
-        individualList.appendChild(li);
+
+    // Lọc ra chỉ những cá nhân là chủ hộ
+    const householdHeads = individuals.filter(individual => individual.la_chu_ho);
+
+    // Sắp xếp chủ hộ theo số hộ khẩu
+    householdHeads.sort((a, b) => {
+        // Giả sử số hộ khẩu có dạng "HKxxx"
+        const numA = parseInt(a.so_ho_khau.substring(2));
+        const numB = parseInt(b.so_ho_khau.substring(2));
+        return numA - numB;
     });
+
+    householdHeads.forEach((head) => {
+        const householdBox = document.createElement('div');
+        householdBox.className = 'household-box';
+        
+        householdBox.innerHTML = `
+            <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-color);">Hộ khẩu của ${head.ho_ten}</h4>
+            <p>Số hộ khẩu: ${head.so_ho_khau}</p>
+            <button class="toggle-members" onclick="showHouseholdDetails('${head.so_ho_khau}')">Xem chi tiết</button>
+        `;
+        
+        individualList.appendChild(householdBox);
+    });
+}
+
+function toggleHouseholdMembers(soHoKhau) {
+    const membersList = document.getElementById(`members-${soHoKhau}`);
+    if (membersList) {
+        membersList.style.display = membersList.style.display === 'none' ? 'block' : 'none';
+    }
 }
 
 function showEditHouseholdForm(index) {
@@ -162,7 +171,20 @@ function showEditHouseholdForm(index) {
     document.getElementById('editSoHoKhau').value = household.so_ho_khau || '';
     document.getElementById('editTenChuHo').value = household.ten_chu_ho || '';
     document.getElementById('editDiaChiThuongTru').value = household.dia_chi_thuong_tru || '';
-    document.getElementById('editNgayCapHoKhau').value = household.ngay_cap_ho_khau || '';
+    
+    // Xử lý ngày cấp hộ khẩu
+    if (household.ngay_cap_ho_khau) {
+        const date = new Date(household.ngay_cap_ho_khau);
+        if (!isNaN(date.getTime())) {
+            // Định dạng ngày thành YYYY-MM-DD để hiển thị trong input type="date"
+            document.getElementById('editNgayCapHoKhau').value = date.toISOString().split('T')[0];
+        } else {
+            console.error('Invalid date:', household.ngay_cap_ho_khau);
+            document.getElementById('editNgayCapHoKhau').value = '';
+        }
+    } else {
+        document.getElementById('editNgayCapHoKhau').value = '';
+    }
 
     showModal('editHouseholdModal');
 }
@@ -174,7 +196,12 @@ async function updateHousehold() {
     const dia_chi_thuong_tru = document.getElementById('editDiaChiThuongTru').value;
     const ngay_cap_ho_khau = document.getElementById('editNgayCapHoKhau').value;
 
-    households[index] = { so_ho_khau, ten_chu_ho, dia_chi_thuong_tru, ngay_cap_ho_khau };
+    households[index] = { 
+        so_ho_khau, 
+        ten_chu_ho, 
+        dia_chi_thuong_tru, 
+        ngay_cap_ho_khau: ngay_cap_ho_khau ? new Date(ngay_cap_ho_khau).toISOString() : null 
+    };
 
     // Cập nhật thông tin chủ hộ trong danh sách individuals
     const individualIndex = individuals.findIndex(individual => individual.so_ho_khau === so_ho_khau && individual.la_chu_ho);
@@ -200,11 +227,23 @@ async function updateHousehold() {
 }
 
 async function deleteHousehold(index) {
-    if (confirm('Bạn có chắc chắn muốn xóa hộ khẩu này?')) {
-        households.splice(index, 1);
-        await writeData();
-        updateHouseholdList();
-        showNotification('Đã xóa hộ khẩu thành công!');
+    const household = households[index];
+    if (confirm(`Bạn có chắc chắn muốn xóa hộ khẩu số ${household.so_ho_khau}? Tất cả nhân khẩu trong hộ này cũng sẽ bị xóa.`)) {
+        try {
+            // Xóa tất cả nhân khẩu thuộc hộ khẩu này
+            individuals = individuals.filter(individual => individual.so_ho_khau !== household.so_ho_khau);
+            
+            // Xóa hộ khẩu
+            households.splice(index, 1);
+            
+            await writeData();
+            updateHouseholdList();
+            updateIndividualList();
+            showNotification('Đã xóa hộ khẩu và các nhân khẩu liên quan thành công!');
+        } catch (error) {
+            console.error('Lỗi khi xóa hộ khẩu:', error);
+            showNotification('Có lỗi xảy ra khi xóa hộ khẩu. Vui lòng thử lại.', true);
+        }
     }
 }
 
@@ -212,21 +251,31 @@ function showEditIndividualForm(index) {
     const individual = individuals[index];
     document.getElementById('editIndividualIndex').value = index;
     document.getElementById('editHoTen').value = individual.ho_ten;
-    document.getElementById('editBiDanh').value = individual.bi_danh;
-    document.getElementById('editNgaySinh').value = individual.ngay_sinh;
-    document.getElementById('editNoiSinh').value = individual.noi_sinh;
-    document.getElementById('editNguyenQuan').value = individual.nguyen_quan;
-    document.getElementById('editDanToc').value = individual.dan_toc;
-    document.getElementById('editNgheNghiep').value = individual.nghe_nghiep;
-    document.getElementById('editNoiLamViec').value = individual.noi_lam_viec;
-    document.getElementById('editCmnd').value = individual.cmnd;
-    document.getElementById('editNgayCapCMND').value = individual.ngay_cap_cmnd;
-    document.getElementById('editNoiCapCMND').value = individual.noi_cap_cmnd;
-    document.getElementById('editNgayDangKyThuongTru').value = individual.ngay_dang_ky_thuong_tru;
-    document.getElementById('editDiaChiTruocKhiChuyenDen').value = individual.dia_chi_truoc_khi_chuyen_den;
-    document.getElementById('editQuanHeVoiChuHo').value = individual.quan_he_voi_chu_ho;
+    document.getElementById('editBiDanh').value = individual.bi_danh || '';
+    document.getElementById('editNgaySinh').value = formatDateForInput(individual.ngay_sinh);
+    document.getElementById('editNoiSinh').value = individual.noi_sinh || '';
+    document.getElementById('editNguyenQuan').value = individual.nguyen_quan || '';
+    document.getElementById('editDanToc').value = individual.dan_toc || '';
+    document.getElementById('editNgheNghiep').value = individual.nghe_nghiep || '';
+    document.getElementById('editNoiLamViec').value = individual.noi_lam_viec || '';
+    document.getElementById('editCmnd').value = individual.cmnd || '';
+    document.getElementById('editNgayCapCMND').value = formatDateForInput(individual.ngay_cap_cmnd);
+    document.getElementById('editNoiCapCMND').value = individual.noi_cap_cmnd || '';
+    document.getElementById('editNgayDangKyThuongTru').value = formatDateForInput(individual.ngay_dang_ky_thuong_tru);
+    document.getElementById('editDiaChiTruocKhiChuyenDen').value = individual.dia_chi_truoc_khi_chuyen_den || '';
+    document.getElementById('editQuanHeVoiChuHo').value = individual.quan_he_voi_chu_ho || '';
     document.getElementById('editLaChuHo').checked = individual.la_chu_ho;
+    document.getElementById('editGioiTinh').value = individual.gioi_tinh || 'Nam';
+    document.getElementById('editSoHoKhau').value = individual.so_ho_khau || '';
     showModal('editIndividualModal');
+}
+
+// Thêm hàm mới để định dạng ngày tháng cho input
+function formatDateForInput(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
 }
 
 async function updateIndividual() {
@@ -246,6 +295,8 @@ async function updateIndividual() {
     const dia_chi_truoc_khi_chuyen_den = document.getElementById('editDiaChiTruocKhiChuyenDen').value;
     const quan_he_voi_chu_ho = document.getElementById('editQuanHeVoiChuHo').value;
     const la_chu_ho = document.getElementById('editLaChuHo').checked;
+    const gioi_tinh = document.getElementById('editGioiTinh').value;
+    const so_ho_khau = document.getElementById('editSoHoKhau').value;
 
     individuals[index] = {
         ho_ten,
@@ -262,7 +313,9 @@ async function updateIndividual() {
         ngay_dang_ky_thuong_tru,
         dia_chi_truoc_khi_chuyen_den,
         quan_he_voi_chu_ho,
-        la_chu_ho
+        la_chu_ho,
+        gioi_tinh,
+        so_ho_khau,
     };
     await writeData();
     updateIndividualList();
@@ -313,7 +366,82 @@ function hideHouseholdForm() {
 }
 
 function showAddIndividualForm() {
-    showModal('individualModal');
+    // Tạo danh sách các số hộ khẩu hiện có
+    const householdOptions = households.map(h => 
+        `<option value="${h.so_ho_khau}">${h.so_ho_khau} - ${h.ten_chu_ho}</option>`
+    ).join('');
+
+    const formHTML = `
+        <h3>Thêm nhân khẩu mới</h3>
+        <form id="addIndividualForm">
+            <label for="soHoKhau">Số hộ khẩu:</label>
+            <select id="soHoKhau" required>
+                <option value="">-- Chọn số hộ khẩu --</option>
+                ${householdOptions}
+            </select>
+            
+            <label for="hoTen">Họ và tên:</label>
+            <input type="text" id="hoTen" required>
+            
+            <label for="biDanh">Bí danh:</label>
+            <input type="text" id="biDanh">
+            
+            <label for="ngaySinh">Ngày sinh:</label>
+            <input type="date" id="ngaySinh" required>
+            
+            <label for="gioiTinh">Giới tính:</label>
+            <select id="gioiTinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+            </select>
+            
+            <label for="noiSinh">Nơi sinh:</label>
+            <input type="text" id="noiSinh">
+            
+            <label for="nguyenQuan">Nguyên quán:</label>
+            <input type="text" id="nguyenQuan">
+            
+            <label for="danToc">Dân tộc:</label>
+            <input type="text" id="danToc">
+            
+            <label for="ngheNghiep">Nghề nghiệp:</label>
+            <input type="text" id="ngheNghiep">
+            
+            <label for="noiLamViec">Nơi làm việc:</label>
+            <input type="text" id="noiLamViec">
+            
+            <label for="cmnd">Số CMND/CCCD:</label>
+            <input type="text" id="cmnd">
+            
+            <label for="ngayCapCMND">Ngày cấp CMND/CCCD:</label>
+            <input type="date" id="ngayCapCMND">
+            
+            <label for="noiCapCMND">Nơi cấp CMND/CCCD:</label>
+            <input type="text" id="noiCapCMND">
+            
+            <label for="quanHeVoiChuHo">Quan hệ với chủ hộ:</label>
+            <input type="text" id="quanHeVoiChuHo" required>
+            
+            <label for="ngayDangKyThuongTru">Ngày đăng ký thường trú:</label>
+            <input type="date" id="ngayDangKyThuongTru">
+            
+            <label for="diaChiTruocKhiChuyenDen">Địa chỉ trước khi chuyển đến:</label>
+            <input type="text" id="diaChiTruocKhiChuyenDen">
+            
+            <button type="submit">Thêm nhân khẩu</button>
+        </form>
+    `;
+
+    showModal('individualModal', formHTML);
+
+    document.getElementById('addIndividualForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addIndividual();
+    });
+
+    // Log để kiểm tra
+    console.log('Số lượng hộ khẩu:', households.length);
+    console.log('Danh sách hộ khẩu:', households);
 }
 
 function hideIndividualForm() {
@@ -374,7 +502,7 @@ async function addHousehold() {
 
     households.push(householdData);
 
-    // Thêm chủ hộ vào danh sách individuals
+    // Thêm ch hộ vào danh sách individuals
     individuals.push({
         ho_ten: ten_chu_ho,
         so_ho_khau: so_ho_khau,
@@ -400,60 +528,75 @@ function toggleNewbornFields() {
 }
 
 async function addIndividual() {
-    const laMoiSinh = document.getElementById('laMoiSinh').checked;
-    const ho_ten = document.getElementById('hoTen').value;
-    const ngay_sinh = document.getElementById('ngaySinh').value;
-    const gioi_tinh = document.getElementById('gioiTinh').value;
-    const quan_he_voi_chu_ho = document.getElementById('quanHeVoiChuHo').value;
-    const so_ho_khau = document.getElementById('soHoKhau').value;
+    const soHoKhau = document.getElementById('soHoKhau').value;
+    const hoTen = document.getElementById('hoTen').value;
+    const ngaySinh = document.getElementById('ngaySinh').value;
+    const gioiTinh = document.getElementById('gioiTinh').value;
+    const biDanh = document.getElementById('biDanh').value;
+    const noiSinh = document.getElementById('noiSinh').value;
+    const nguyenQuan = document.getElementById('nguyenQuan').value;
+    const danToc = document.getElementById('danToc').value;
+    const ngheNghiep = document.getElementById('ngheNghiep').value;
+    const noiLamViec = document.getElementById('noiLamViec').value;
+    const cmnd = document.getElementById('cmnd').value;
+    const ngayCapCMND = document.getElementById('ngayCapCMND').value;
+    const noiCapCMND = document.getElementById('noiCapCMND').value;
+    const quanHeVoiChuHo = document.getElementById('quanHeVoiChuHo').value;
+    const ngayDangKyThuongTru = document.getElementById('ngayDangKyThuongTru').value;
+    const diaChiTruocKhiChuyenDen = document.getElementById('diaChiTruocKhiChuyenDen').value;
 
-    const individual = {
-        ho_ten,
-        ngay_sinh,
-        gioi_tinh,
-        quan_he_voi_chu_ho,
-        so_ho_khau,
-        bi_danh: '',
-        noi_sinh: laMoiSinh ? 'Mới sinh' : '',
-        nguyen_quan: '',
-        dan_toc: '',
-        ngay_dang_ky_thuong_tru: new Date().toISOString().split('T')[0], // Ngày hiện tại
-        la_chu_ho: false
+    if (!ngaySinh) {
+        showNotification('Vui lòng nhập ngày sinh', true);
+        return;
+    }
+
+    // Kiểm tra xem hộ khẩu đã tồn tại chưa
+    const existingHousehold = households.find(h => h.so_ho_khau === soHoKhau);
+    if (!existingHousehold) {
+        showNotification('Hộ khẩu không tồn tại. Vui lòng tạo hộ khẩu trước.', true);
+        return;
+    }
+
+    const newIndividual = {
+        so_ho_khau: soHoKhau,
+        ho_ten: hoTen,
+        ngay_sinh: ngaySinh,
+        gioi_tinh: gioiTinh,
+        bi_danh: biDanh,
+        noi_sinh: noiSinh,
+        nguyen_quan: nguyenQuan,
+        dan_toc: danToc,
+        nghe_nghiep: ngheNghiep,
+        noi_lam_viec: noiLamViec,
+        cmnd: cmnd,
+        ngay_cap_cmnd: ngayCapCMND,
+        noi_cap_cmnd: noiCapCMND,
+        quan_he_voi_chu_ho: quanHeVoiChuHo,
+        ngay_dang_ky_thuong_tru: ngayDangKyThuongTru,
+        dia_chi_truoc_khi_chuyen_den: diaChiTruocKhiChuyenDen,
+        la_chu_ho: quanHeVoiChuHo.toLowerCase() === 'chủ hộ'
     };
 
-    if (laMoiSinh) {
-        individual.nghe_nghiep = '';
-        individual.noi_lam_viec = '';
-        individual.cmnd = '';
-        individual.ngay_cap_cmnd = '';
-        individual.noi_cap_cmnd = '';
-        individual.dia_chi_truoc_khi_chuyen_den = 'Mới sinh';
-    } else {
-        individual.nghe_nghiep = document.getElementById('ngheNghiep').value;
-        individual.noi_lam_viec = document.getElementById('noiLamViec').value;
-        individual.cmnd = document.getElementById('cmnd').value;
-        individual.ngay_cap_cmnd = document.getElementById('ngayCapCMND').value;
-        individual.noi_cap_cmnd = document.getElementById('noiCapCMND').value;
-        individual.dia_chi_truoc_khi_chuyen_den = document.getElementById('diaChiTruocKhiChuyenDen').value;
-    }
+    try {
+        individuals.push(newIndividual);
 
-    individuals.push(individual);
-
-    // Cập nhật hộ khẩu tương ứng
-    const household = households.find(h => h.so_ho_khau === so_ho_khau);
-    if (household) {
-        if (!household.thanh_vien) {
-            household.thanh_vien = [];
+        // Nếu là chủ hộ, cập nhật thông tin trong bảng hộ khẩu
+        if (newIndividual.la_chu_ho) {
+            const householdIndex = households.findIndex(h => h.so_ho_khau === soHoKhau);
+            if (householdIndex !== -1) {
+                households[householdIndex].ten_chu_ho = hoTen;
+            }
         }
-        household.thanh_vien.push(individual.ho_ten);
-    }
 
-    await writeData();
-    updateIndividualList();
-    updateHouseholdList();
-    showNotification('Thêm nhân khẩu thành công!');
-    closeModal('individualModal');
-    clearIndividualForm();
+        await writeData();
+        updateIndividualList();
+        updateHouseholdList(); // Cập nhật lại danh sách hộ khẩu nếu có thay đổi
+        closeModal('individualModal');
+        showNotification('Thêm nhân khẩu thành công!');
+    } catch (error) {
+        console.error('Lỗi khi thêm nhân khẩu:', error);
+        showNotification('Có lỗi xảy ra khi thêm nhân khẩu. Vui lòng thử lại.', true);
+    }
 }
 
 function clearIndividualForm() {
@@ -593,63 +736,21 @@ function exportReport() {
     document.body.removeChild(a);
 }
 
-function showIndividualDetails(index) {
-    const individual = individuals[index];
-    const detailsHTML = `
-        <h3>Chi tiết nhân khu</h3>
-        <p><strong>Họ và tên:</strong> ${individual.ho_ten}</p>
-        <p><strong>Bí danh:</strong> ${individual.bi_danh || 'Không có'}</p>
-        <p><strong>Ngày sinh:</strong> ${individual.ngay_sinh.split('T')[0]}</p>
-        <p><strong>Nơi sinh:</strong> ${individual.noi_sinh}</p>
-        <p><strong>Nguyên quán:</strong> ${individual.nguyen_quan}</p>
-        <p><strong>Dân tộc:</strong> ${individual.dan_toc}</p>
-        <p><strong>Nghề nghiệp:</strong> ${individual.nghe_nghiep}</p>
-        <p><strong>Nơi làm việc:</strong> ${individual.noi_lam_viec || 'Không có'}</p>
-        <p><strong>CMND/CCCD:</strong> ${individual.cmnd}</p>
-        <p><strong>Ngày cấp CMND/CCCD:</strong> ${individual.ngay_cap_cmnd.split('T')[0]}</p>
-        <p><strong>Nơi cấp CMND/CCCD:</strong> ${individual.noi_cap_cmnd}</p>
-        <p><strong>Ngày đăng ký thường trú:</strong> ${individual.ngay_dang_ky_thuong_tru.split('T')[0]}</p>
-        <p><strong>Địa chỉ trước khi chuyển đến:</strong> ${individual.dia_chi_truoc_khi_chuyen_den || 'Không có'}</p>
-        <p><strong>Quan hệ với chủ hộ:</strong> ${individual.quan_he_voi_chu_ho || 'Không có'}</p>
-        <p><strong>Là chủ hộ:</strong> ${individual.la_chu_ho ? 'Có' : 'Không'}</p>
-    `;
-    showModal('detailsModal', detailsHTML);
-}
-
-// Cập nhật hàm showModal để hỗ trợ nội dung tùy chỉnh
-function showModal(modalId, content = null) {
-    const modal = document.getElementById(modalId);
-    if (content) {
-        const modalContent = modal.querySelector('.modal-content');
-        modalContent.innerHTML = `
-            <span class="close">&times;</span>
-            ${content}
-        `;
-        
-        // Thêm event listener cho nút đóng
-        const closeButton = modalContent.querySelector('.close');
-        closeButton.onclick = function() {
-            closeModal(modalId);
-        };
-    }
-    modal.style.display = 'block';
-}
-
-function showHouseholdDetails(index) {
-    const household = households[index];
-    const householdMembers = individuals.filter(individual => individual.so_ho_khau === household.so_ho_khau);
+function showHouseholdDetails(soHoKhau) {
+    const household = households.find(h => h.so_ho_khau === soHoKhau);
+    const householdMembers = individuals.filter(individual => individual.so_ho_khau === soHoKhau);
     
     let detailsHTML = `
         <h3>Chi tiết hộ khẩu</h3>
         <p><strong>Số hộ khẩu:</strong> ${household.so_ho_khau}</p>
         <p><strong>Chủ hộ:</strong> ${household.ten_chu_ho}</p>
         <p><strong>Địa chỉ:</strong> ${household.dia_chi_thuong_tru}</p>
-        <p><strong>Ngày cấp:</strong> ${household.ngay_cap_ho_khau.split('T')[0]}</p>
+        <p><strong>Ngày cấp:</strong> ${formatDate(household.ngay_cap_ho_khau)}</p>
         <h4>Thành viên trong hộ:</h4>
         <ul>
     `;
     
-    householdMembers.forEach((member, memberIndex) => {
+    householdMembers.forEach((member) => {
         detailsHTML += `
             <li>
                 ${member.ho_ten} (${member.quan_he_voi_chu_ho})
@@ -660,7 +761,60 @@ function showHouseholdDetails(index) {
     
     detailsHTML += `
         </ul>
+        <button onclick="showEditHouseholdForm(${households.indexOf(household)})">Sửa hộ khẩu</button>
+        <button onclick="closeModal('detailsModal')">Đóng</button>
     `;
     
     showModal('detailsModal', detailsHTML);
+}
+
+function showIndividualDetails(index) {
+    const individual = individuals[index];
+    const detailsHTML = `
+        <h3>Chi tiết nhân khẩu</h3>
+        <p><strong>Họ và tên:</strong> ${individual.ho_ten}</p>
+        <p><strong>Bí danh:</strong> ${individual.bi_danh || 'Không có'}</p>
+        <p><strong>Ngày sinh:</strong> ${formatDate(individual.ngay_sinh)}</p>
+        <p><strong>Giới tính:</strong> ${individual.gioi_tinh || 'Không xác định'}</p>
+        <p><strong>Nơi sinh:</strong> ${individual.noi_sinh || 'Không có'}</p>
+        <p><strong>Nguyên quán:</strong> ${individual.nguyen_quan || 'Không có'}</p>
+        <p><strong>Dân tộc:</strong> ${individual.dan_toc || 'Không có'}</p>
+        <p><strong>Nghề nghiệp:</strong> ${individual.nghe_nghiep || 'Không có'}</p>
+        <p><strong>Nơi làm việc:</strong> ${individual.noi_lam_viec || 'Không có'}</p>
+        <p><strong>CMND/CCCD:</strong> ${individual.cmnd || 'Không có'}</p>
+        <p><strong>Ngày cấp CMND/CCCD:</strong> ${formatDate(individual.ngay_cap_cmnd)}</p>
+        <p><strong>Nơi cấp CMND/CCCD:</strong> ${individual.noi_cap_cmnd || 'Không có'}</p>
+        <p><strong>Ngày đăng ký thường trú:</strong> ${formatDate(individual.ngay_dang_ky_thuong_tru)}</p>
+        <p><strong>Địa chỉ trước khi chuyển đến:</strong> ${individual.dia_chi_truoc_khi_chuyen_den || 'Không có'}</p>
+        <p><strong>Quan hệ với chủ hộ:</strong> ${individual.quan_he_voi_chu_ho || 'Không có'}</p>
+        <p><strong>Là chủ hộ:</strong> ${individual.la_chu_ho ? 'Có' : 'Không'}</p>
+        <button onclick="showEditIndividualForm(${index})">Sửa nhân khẩu</button>
+        <button onclick="closeModal('detailsModal')">Đóng</button>
+    `;
+    showModal('detailsModal', detailsHTML);
+}
+
+// Hàm hỗ trợ để định dạng ngày tháng
+function formatDate(dateString) {
+    if (!dateString) return 'Không có';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Ngày không hợp lệ' : date.toLocaleDateString('vi-VN');
+}
+
+// Cập nhật hàm showModal để hỗ trợ nội dung tùy chỉnh
+function showModal(modalId, content = null) {
+    const modal = document.getElementById(modalId);
+    if (content) {
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.innerHTML = `
+            <span class="close" onclick="closeModal('${modalId}')">&times;</span>
+            ${content}
+        `;
+    }
+    modal.style.display = 'block';
+}
+
+// Thêm hàm closeModal nếu chưa có
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
 }
