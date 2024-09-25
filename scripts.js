@@ -754,14 +754,20 @@ function showHouseholdDetails(soHoKhau) {
         detailsHTML += `
             <li>
                 ${member.ho_ten} (${member.quan_he_voi_chu_ho})
-                <button onclick="showIndividualDetails(${individuals.indexOf(member)})">Xem chi tiết</button>
+                <button style="
+                display: flex; position: relative; right: 10px;"
+                 onclick="showIndividualDetails(${individuals.indexOf(member)})">Xem chi tiết</button>
             </li>
+            <br/>
         `;
     });
     
     detailsHTML += `
         </ul>
-        <button onclick="showEditHouseholdForm(${households.indexOf(household)})">Sửa hộ khẩu</button>
+        <button 
+        style="
+        display: inline; position: relative; right: 10px;"
+         onclick="showEditHouseholdForm(${households.indexOf(household)})">Sửa hộ khẩu</button>
         <button onclick="closeModal('detailsModal')">Đóng</button>
     `;
     
