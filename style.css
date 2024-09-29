@@ -27,6 +27,18 @@ body {
 }
 
 /* Header */
+nav {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1000; 
+    padding: 10px 20px 10px 30px; /* Thêm khoảng cách bên trong */
+    background-color:rgba(53,152,219, 1)    ;
+    backdrop-filter: blur(20px);
+width: 100%;
+
+}
+
 header {
     background-color: var(--primary-color);
     color: #fff;
@@ -39,6 +51,7 @@ header {
 header .logo {
     width: 80px;
     margin-bottom: 15px;
+    margin-top: 40px;
 }
 
 header h1 {

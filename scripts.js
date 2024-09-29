@@ -1,5 +1,5 @@
 let households = [];
-let individuals = [];
+let individuals = []; 
 // lsof -i :5500
 // kill -9 <PID>
 // Thêm log vào đầu file
@@ -113,7 +113,7 @@ function updateHouseholdList() {
                 <p><strong>Địa chỉ:</strong> ${household.dia_chi_thuong_tru || 'N/A'}</p>
             </div>
             <div class="action-buttons">
-                <button onclick="showHouseholdDetails(${index})">Xem chi tiết</button>
+                <button onclick="showHouseholdDetails1('${household.so_ho_khau}')">Xem chi tiết</button>
                 <button onclick="showEditHouseholdForm(${index})">Sửa</button>
                 <button onclick="deleteHousehold(${index})">Xóa</button>
             </div>
@@ -617,7 +617,10 @@ function clearIndividualForm() {
 
 // Thêm hàm này vào cuối file
 window.addEventListener('load', function() {
-    document.getElementById('laMoiSinh').addEventListener('change', toggleNewbornFields);
+    const laMoiSinhElement = document.getElementById('laMoiSinh');
+    if (laMoiSinhElement) {
+        laMoiSinhElement.addEventListener('change', toggleNewbornFields);
+    }
 });
 
 function showNotification(message, isError = false) {
@@ -735,7 +738,39 @@ function exportReport() {
     a.click();
     document.body.removeChild(a);
 }
+function showHouseholdDetails1(soHoKhau) {
+    const household = households.find(h => h.so_ho_khau === soHoKhau);
+    const householdMembers = individuals.filter(individual => individual.so_ho_khau === soHoKhau);
+    
+    if (!household) {
+        console.error(`Không tìm thấy hộ khẩu với số hộ khẩu: ${soHoKhau}`);
+        alert('Không tìm thấy hộ khẩu này.');
+        return; // Dừng hàm nếu không tìm thấy hộ khẩu
+    }
 
+    let detailsHTML = `
+        <h3>Chi tiết hộ khẩu</h3>
+        <p><strong>Số hộ khẩu:</strong> ${household.so_ho_khau}</p>
+        <p><strong>Chủ hộ:</strong> ${household.ten_chu_ho}</p>
+        <p><strong>Địa chỉ:</strong> ${household.dia_chi_thuong_tru}</p>
+        <p><strong>Ngày cấp:</strong> ${formatDate(household.ngay_cap_ho_khau)}</p>
+       
+        <ul>
+    `;
+    
+    householdMembers.forEach((member) => {
+        detailsHTML += `
+            
+        `;
+    });
+    
+    detailsHTML += `
+        </ul>
+        <button onclick="closeModal('detailsModal')">Đóng</button>
+    `;
+
+    showModal('detailsModal', detailsHTML); // Hiển thị nội dung trong modal
+}
 function showHouseholdDetails(soHoKhau) {
     const household = households.find(h => h.so_ho_khau === soHoKhau);
     const householdMembers = individuals.filter(individual => individual.so_ho_khau === soHoKhau);
